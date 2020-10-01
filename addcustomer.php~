@@ -1,0 +1,122 @@
+<?php
+//include("header.php");
+include("dbconnect.php");
+//session_start();
+?>
+<?php
+$m=date("Y-m-d");
+//if(isset($_POST["button"]))
+{
+  $sqle= "SELECT MAX(custid), MAX(aid) FROM mybank.customers";
+  if(!$row=mysqli_fetch_array(mysqli_query($conn,$sqle),MYSQLI_BOTH)){
+    die('Error:1 here ' . mysqli_error());
+  }
+  {
+
+    $row[0]=$row[0]+1;
+
+    $row[1]= $row[1]+1;
+echo "$row[0]";
+echo "$row[1]";
+  }
+if(isset($_POST["button"])) {
+$bname = $_POST[bname];
+$fname = $_POST[fname];
+$lname = $_POST[lname];
+$phoneno = $_POST[phoneno];
+$emailid = $_POST[email];
+$loginid = $_POST[loginid];
+$passwd = $_POST[passwd];
+$transcpasswd =$_POST[transcpasswd];
+$state = $_POST[state];
+$city = $_POST[city];
+$address = $_POST[address];
+
+$sqla = "INSERT INTO mybank.address VALUES ('$row[1]','$city', '$state', '$address')";
+mysqli_query($conn,$sqla);
+// $sqlb = "INSERT INTO mybank.branch(bname,aid) VALUES ('$bname','$row[1]')";
+// mysqli_query($conn,$sqlb);
+$sqll = "INSERT INTO mybank.login VALUES ('$loginid','$passwd','$transcpasswd')";
+mysqli_query($conn,$sqll);
+$sqlbs = "SELECT ifsc FROM mybank.branch WHERE bname = '$bname' ";
+mysqli_query($conn,$sqlbs);
+$branchvalue = mysqli_fetch_array($sqlbs,MYSQLI_BOTH);
+$sql="INSERT INTO mybank.customers (custid,ifsc, fname,lname,loginid,aid,phoneno,emailid) VALUES ('$row[0]','$branchvalue[0]','$_POST[fname]','$_POST[lname]','$_POST[loginid]','$row[1]','$_POST[phoneno]','$_POST[emailid]')";
+
+if (!mysqli_query($conn,$sql))
+  {
+  die('Error:2 ' . mysqli_error());
+  }
+ $succres ="1 CUSTOMER RECORD ADDED SUCCESSFULLY.....";
+}
+$resq = mysqli_query($conn,"SELECT ifsc, bname FROM mybank.branch");
+}
+?>
+<div id="templatemo_main"><span class="main_top"></span>
+  <div id="templatemo_content">
+  
+<form id="form1" name="form1" method="get" action="">
+    <p>&nbsp;<?php echo $succres; ?></p>
+    <p>BRANCH NAME  
+      <select name="bname">
+        <?php
+	  while($rta = mysqli_fetch_array($resq,MYSQLI_BOTH) )
+	  {
+		  echo "<option value='$rta[ifsc]'>$rta[bname]</value>";
+	  }
+	  ?>
+      </select>
+    </p>
+    <p>FIRST NAME  
+      <label for="firstname"></label>
+      <input type="text" name="fname" />
+    </p>
+    <p>LAST NAME  
+      <label for="lastname"></label>
+      <input type="text" name="lname"/>
+  </p>
+  <p>PHONE NUMBER
+    <input type="text" name="phoneno" />
+  </p>
+      <p>EMAILID 
+      <input type="text" name="email" />
+    </p>
+<p>LOGIN ID   
+  <input type="text" name="loginid"/>
+</p>
+<p>ACCOUNT PASSWORD 
+  <input type="password" name="passwd" />
+</p>
+  <p>TRANSACTION PASSWORD
+    <input type="password" name="transcpasswd"  />
+  </p>  
+  <p>STATE
+    <label for="textfield"></label>
+    <select name="state" id="state">
+    <option value="">Select</option>
+    <option value="KARNATAKA">KARNATAKA</option>
+      <option value="KERALA">KERALA</option>
+    </select>
+  </p>
+  <p>CITY
+
+    <input type="text" name="city" id="city" />
+  </p>
+   <p>ADDRESS
+    <input type="text" name="address"  />
+  </p>
+  <p>
+    <input type="submit" name="button" id="button" value="addcustomers"   class="submit_btn float_r"/>
+  </p>
+</form>
+<p>&nbsp;</p>
+<p>&nbsp; </p>
+  </div><!-- end of content -->
+
+  <div class="cleaner"></div>
+     </div>     <!-- end of main -->
+    <div id="templatemo_main_bottom"></div><!-- end of main -->
+    
+    <?php
+	include("footer.php");
+	?>
